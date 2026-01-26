@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sealed-secrets-controller
+  namespace: flux-system
+spec:
+  targetNamespace: sealed-secrets
+  storageNamespace: sealed-secrets
+  chart:
+    spec:
+      chart: sealed-secrets
+      version: "2.18.0"
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: sealed-secrets
+        namespace: flux-system
+  interval: 1h
+  install:
+    createNamespace: true
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    ingress:
+      enabled: true
+      hostname: sealed-secrets.gewis.nl
+      path: /v1/cert.pem
+      pathType: ImplementationSpecific

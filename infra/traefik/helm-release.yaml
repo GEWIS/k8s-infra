@@ -1,0 +1,65 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  targetNamespace: traefik
+  storageNamespace: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: "39.0.2"
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+  interval: 1h
+  install:
+    createNamespace: true
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    ingressClass:
+      enabled: true
+      isDefaultClass: true
+      name: traefik
+    ports:
+      web:
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
+      websecure:
+        asDefault: true
+        forwardedHeaders:
+          trustedIPs:
+            - "10.82.50.107"
+    logs:
+      access:
+        enabled: true
+        format: "json"
+        fields:
+          headers:
+            defaultmode: keep
+    ingressRoute:
+      dashboard:
+        enabled: true
+        entryPoints:
+          - "websecure"
+        matchRule: Host(`traefik.gewis.nl`)
+        middlewares:
+          - name: traefik-dashboard-auth
+    experimental:
+      plugins:
+        traefik-oidc-auth:
+          moduleName: "github.com/sevensolutions/traefik-oidc-auth"
+          version: "v0.17.0"
+    tlsStore:
+      default:
+        defaultCertificate:
+          secretName: wildcard-gewis-nl-tls

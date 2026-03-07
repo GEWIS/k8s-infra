@@ -53,7 +53,7 @@ spec:
           - "websecure"
         matchRule: Host(`traefik.gewis.nl`)
         middlewares:
-          - name: traefik-dashboard-auth
+          - name: dashboard-auth
     experimental:
       plugins:
         traefik-oidc-auth:

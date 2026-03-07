@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-gewis-nl
+  namespace: traefik
+spec:
+  secretName: wildcard-gewis-nl-tls
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+  dnsNames:
+    - gewis.nl
+    - "*.gewis.nl"
+    - gew.is
+    - "*.gew.is"
+    - "*.test.gewis.nl"

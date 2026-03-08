@@ -22,6 +22,11 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    deployment:
+      kind: DaemonSet
+    service:
+      spec:
+        externalTrafficPolicy: Local
     ingressClass:
       enabled: true
       isDefaultClass: true

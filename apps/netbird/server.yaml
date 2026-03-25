@@ -1,0 +1,120 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: netbird-data
+  namespace: netbird
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: netbird
+spec:
+  selector:
+    matchLabels:
+      app: netbird-server
+  template:
+    metadata:
+      labels:
+        app: netbird-server
+    spec:
+      containers:
+        - name: server
+          image: netbirdio/netbird-server:0.67.0
+          args:
+            - "--config=/etc/netbird/config.yaml"
+          ports:
+            - containerPort: 80
+            - containerPort: 3478
+              protocol: UDP
+          volumeMounts:
+            - mountPath: /etc/netbird
+              name: netbird-config
+            - mountPath: /var/lib/netbird
+              name: netbird-data
+      volumes:
+        - name: netbird-config
+          secret:
+            secretName: netbird-config
+        - name: netbird-data
+          persistentVolumeClaim:
+            claimName: netbird-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: netbird-service
+  namespace: netbird
+spec:
+  selector:
+    app: netbird-server
+  ports:
+    - name: http
+      port: 80
+    - name: grpc
+      port: 81
+      targetPort: 80
+      appProtocol: kubernetes.io/h2c
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: netbird-stun
+  namespace: netbird
+spec:
+  type: LoadBalancer
+  selector:
+    app: netbird-server
+  ports:
+    - name: stun
+      port: 3478
+      protocol: UDP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: netbird
+  namespace: netbird
+spec:
+  parentRefs:
+    - name: traefik-gateway
+      namespace: traefik
+  hostnames:
+    - nb.gewis.nl
+  rules:
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /relay
+      - path:
+          type: PathPrefix
+          value: /ws-proxy
+      - path:
+          type: PathPrefix
+          value: /oauth2
+      - path:
+          type: PathPrefix
+          value: /api
+      backendRefs:
+        - name: netbird-service
+          port: 80
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /signalexchange.SignalExchange
+      - path:
+          type: PathPrefix
+          value: /management.ManagementService
+      - path:
+          type: PathPrefix
+          value: /management.ProxyService
+      backendRefs:
+        - name: netbird-service
+          port: 81

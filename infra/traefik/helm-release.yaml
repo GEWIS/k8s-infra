@@ -62,6 +62,9 @@ spec:
         matchRule: Host(`traefik.gewis.nl`)
         middlewares:
           - name: dashboard-auth
+    providers:
+      kubernetesGateway:
+        enabled: true
     experimental:
       plugins:
         traefik-oidc-auth:

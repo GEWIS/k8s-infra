@@ -1,0 +1,74 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-config
+  namespace: netbird
+data:
+  NETBIRD_MGMT_API_ENDPOINT: "https://nb.gewis.nl"
+  NETBIRD_MGMT_GRPC_API_ENDPOINT: "https://nb.gewis.nl"
+  AUTH_AUDIENCE: netbird-dashboard
+  AUTH_CLIENT_ID: netbird-dashboard
+  AUTH_CLIENT_SECRET: ""
+  AUTH_AUTHORITY: "https://nb.gewis.nl/oauth2"
+  USE_AUTH0: "false"
+  AUTH_SUPPORTED_SCOPES: "openid profile email groups"
+  AUTH_REDIRECT_URI: "/nb-auth"
+  AUTH_SILENT_REDIRECT_URI: "/nb-silent-auth"
+  NGINX_SSL_PORT: "443"
+  LETSENCRYPT_DOMAIN: "none"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard
+  namespace: netbird
+spec:
+  selector:
+    matchLabels:
+      app: netbird-dashboard
+  template:
+    metadata:
+      labels:
+        app: netbird-dashboard
+    spec:
+      containers:
+        - name: dashboard
+          image: netbirdio/dashboard:v2.34.2
+          ports:
+            - containerPort: 80
+          envFrom: 
+            - configMapRef:
+                name: dashboard-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard
+  namespace: netbird
+spec:
+  selector:
+    app: netbird-dashboard
+  ports:
+    - name: http
+      port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: dashboard
+  namespace: netbird
+spec:
+  parentRefs:
+    - name: gateway-external # TODO: Update gateway
+      namespace: gateway-system
+  hostnames:
+    - nb.gewis.nl
+  rules:
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /
+      backendRefs:
+        - name: dashboard
+          port: 80

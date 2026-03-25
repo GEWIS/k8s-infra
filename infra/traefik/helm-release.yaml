@@ -62,6 +62,24 @@ spec:
         matchRule: Host(`traefik.gewis.nl`)
         middlewares:
           - name: dashboard-auth
+    providers:
+      kubernetesGateway:
+        enabled: true
+    gateway:
+      listeners:
+        web:
+          port: 8000
+          protocol: HTTP
+          namespacePolicy:
+            from: All
+        websecure:
+          port: 8443
+          protocol: HTTPS
+          namespacePolicy:
+            from: All
+          certificateRefs:
+            - name: wildcard-gewis-nl-tls
+              namespace: traefik
     experimental:
       plugins:
         traefik-oidc-auth:

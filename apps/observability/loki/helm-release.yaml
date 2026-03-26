@@ -5,6 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: observability
+  releaseName: loki
   interval: 1h
   chart:
     spec:
@@ -12,7 +13,7 @@ spec:
       version: "6.55.0"
       sourceRef:
         kind: HelmRepository
-        name: grafana
+        name: grafana-community
         namespace: flux-system
   values:
     deploymentMode: SingleBinary

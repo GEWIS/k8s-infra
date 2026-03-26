@@ -1,0 +1,78 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alloy
+  namespace: flux-system
+spec:
+  targetNamespace: observability
+  releaseName: alloy
+  interval: 1h
+  chart:
+    spec:
+      chart: alloy
+      version: ">=0.6.0"
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+  values:
+    controller:
+      type: daemonset
+
+    rbac:
+      create: true
+
+    alloy:
+      configReloader:
+        enabled: true
+      configMap:
+        content: |
+          discovery.kubernetes "all_pods" {
+            role = "pod"
+          }
+
+          discovery.relabel "labels" {
+            targets = discovery.kubernetes.all_pods.targets
+
+            // Label: Namespace
+            rule {
+              source_labels = ["__meta_kubernetes_namespace"]
+              target_label  = "namespace"
+            }
+
+            // Label: Pod Name
+            rule {
+              source_labels = ["__meta_kubernetes_pod_name"]
+              target_label  = "pod"
+            }
+
+            // Label: Container Name
+            rule {
+              source_labels = ["__meta_kubernetes_pod_container_name"]
+              target_label  = "container"
+            }
+
+            // Label: Service/App name
+            rule {
+              source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+              target_label  = "app"
+            }
+
+            // Label: Node Name
+            rule {
+              source_labels = ["__meta_kubernetes_pod_node_name"]
+              target_label  = "node"
+            }
+          }
+
+          loki.source.kubernetes "pod_logs" {
+            targets    = discovery.relabel.labels.output
+            forward_to = [loki.write.cbc_loki.receiver]
+          }
+
+          loki.write "cbc_loki" {
+            endpoint {
+              url       = "http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push"
+              tenant_id = "CBC"
+            }
+          }

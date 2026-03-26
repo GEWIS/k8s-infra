@@ -13,7 +13,7 @@ spec:
       version: ">=8.5.x"
       sourceRef:
         kind: HelmRepository
-        name: grafana
+        name: grafana-community
         namespace: flux-system
   values:
     image:

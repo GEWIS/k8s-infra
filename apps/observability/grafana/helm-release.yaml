@@ -1,0 +1,79 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: flux-system
+spec:
+  releaseName: grafana
+  targetNamespace: observability
+  interval: 1h
+  chart:
+    spec:
+      chart: grafana
+      version: ">=8.5.x"
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+  values:
+    image:
+      tag: "12.1.0"
+
+    extraSecretMounts:
+      - name: auth-secrets
+        secretName: grafana-auth-secrets
+        mountPath: /etc/secrets/auth
+        readOnly: true
+
+    grafana.ini:
+      server:
+        root_url: "https://grafana.gewis.nl"
+
+      database:
+        type: postgres
+        host: "pg01.db.gewis.nl"
+        name: "grafanaprod_db"
+        user: "$__file{/etc/secrets/auth/database-user}"
+        password: "$__file{/etc/secrets/auth/database-password}"
+        ssl_mode: require
+        ca_cert_path: "/etc/ssl/certs/ca-certificates.crt"
+
+      auth:
+        disable_login_form: true
+
+      auth.generic_oauth:
+        enabled: true
+        name: "GEWISWG"
+        allow_sign_up: true
+        client_id: "$__file{/etc/secrets/auth/keycloak-client-id}"
+        client_secret: "$__file{/etc/secrets/auth/keycloak-client-secret}"
+        scopes: "openid,email,profile,roles,offline_access"
+        auth_url: "https://auth.gewis.nl/realms/GEWISWG/protocol/openid-connect/auth"
+        token_url: "https://auth.gewis.nl/realms/GEWISWG/protocol/openid-connect/token"
+        api_url: "https://auth.gewis.nl/realms/GEWISWG/protocol/openid-connect/userinfo"
+        use_refresh_token: true
+
+        email_attribute_path: "email"
+        login_attribute_path: "username"
+        name_attribute_path: "full_name"
+
+        role_attribute_path: "contains(roles[*], 'PRIV - Grafana Admin') && 'GrafanaAdmin' || 'None'"
+        role_attribute_strict: true
+        allow_assign_grafana_admin: true
+
+        org_attribute_path: "roles"
+        org_mapping: "GRAFANA-CBC-RO:CBC:Viewer GRAFANA-CBC-RW:CBC:Editor GRAFANA-ABC_CRM-RO:ABC-CRM:Viewer GRAFANA-ABC_CRM-RW:ABC-CRM:Editor GRAFANA-ABC_DB-RO:ABC-DB:Viewer GRAFANA-ABC_DB-RW:ABC-DB:Editor GRAFANA-ABC_EOU-RO:ABC-EOU:Viewer GRAFANA-ABC_EOU-RW:ABC-EOU:Editor GRAFANA-ABC_NC-RO:ABC-NC:Viewer GRAFANA-ABC_NC-RW:ABC-NC:Editor GRAFANA-ABC_POS-RO:ABC-POS:Viewer GRAFANA-ABC_POS-RW:ABC-POS:Editor GRAFANA-ABC_WEB-RO:ABC-WEB:Viewer GRAFANA-ABC_WEB-RW:ABC-WEB:Editor"
+
+    ingress:
+      enabled: true
+      hosts:
+        - grafana.gewis.nl
+
+    livenessProbe:
+      httpGet:
+        path: /api/health
+        port: 3000
+    readinessProbe:
+      httpGet:
+        path: /api/health
+        port: 3000

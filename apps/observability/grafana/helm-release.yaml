@@ -25,6 +25,11 @@ spec:
         mountPath: /etc/secrets/auth
         readOnly: true
 
+    admin:
+      existingSecret: "grafana-auth-secrets"
+      userKey: admin-user
+      passwordKey: admin-password
+
     grafana.ini:
       server:
         root_url: "https://grafana.gewis.nl"
@@ -68,6 +73,18 @@ spec:
       enabled: true
       hosts:
         - grafana.gewis.nl
+
+    sidecar:
+      dashboards:
+        enabled: true
+        label: "grafana_dashboard"
+        labelValue: "1"
+        searchNamespace: "ALL"
+      datasources:
+        enabled: true
+        label: "grafana_datasource"
+        labelValue: "1"
+        searchNamespace: "ALL"
 
     livenessProbe:
       httpGet:

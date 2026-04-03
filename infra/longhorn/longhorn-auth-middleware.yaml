@@ -1,0 +1,25 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: longhorn-auth
+  namespace: longhorn-system
+spec:
+  plugin:
+    traefik-oidc-auth:
+      Authorization:
+        AssertClaims:
+          - AnyOf:
+              - CBC - Application Hosting Team (ADM)
+              - CBC - Backup Team
+              - CBC - Filehosting and backup (ADM)
+            Name: groups
+      Provider:
+        ClientId: traefik-auth
+        ClientSecret: urn:k8s:secret:oidc-secret:providerClientSecret
+        Url: https://auth.gewis.nl/realms/GEWISWG
+        ValidAudience: traefik-auth
+      Scopes:
+        - openid
+        - profile
+        - email
+      Secret: urn:k8s:secret:oidc-secret:pluginSecret

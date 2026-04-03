@@ -1,0 +1,25 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: external-apps
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  url: https://github.com/GEWIS/k8s-apps
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-apps
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: infrastructure
+  interval: 1h
+  retryInterval: 1m
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: external-apps

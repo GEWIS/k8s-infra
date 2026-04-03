@@ -63,6 +63,10 @@ spec:
         middlewares:
           - name: dashboard-auth
     providers:
+      kubernetesIngress:
+        allowExternalNameServices: true
+      kubernetesCRD:
+        allowExternalNameServices: true
       kubernetesGateway:
         enabled: true
     gateway:

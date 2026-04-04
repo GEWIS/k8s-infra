@@ -4,6 +4,6 @@ namespace: kube-system
 
 # this version is enforced by longhorn, see https://longhorn.io/docs/1.9.0/snapshots-and-backups/csi-snapshot-support/enable-csi-snapshot-support
 resources:
-  - https://github.com/kubernetes-csi/external-snapshotter//client/config/crd?ref=v8.2.0
-  - https://github.com/kubernetes-csi/external-snapshotter//deploy/kubernetes/snapshot-controller?ref=v8.2.0
+  - https://github.com/kubernetes-csi/external-snapshotter//client/config/crd?ref=v8.5.0
+  - https://github.com/kubernetes-csi/external-snapshotter//deploy/kubernetes/snapshot-controller?ref=v8.5.0
   - snapshot-class.yaml

@@ -9,7 +9,8 @@ spec:
 
   inheritedMetadata:
     labels:
-      recurring-job.longhorn.io/all: "disabled"
+      recurring-job.longhorn.io/source: enabled
+      recurring-job.longhorn.io/fs-trim: enabled
 
   storage:
     size: 20Gi

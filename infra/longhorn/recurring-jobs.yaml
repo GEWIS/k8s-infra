@@ -48,3 +48,18 @@ spec:
   parameters: {}
   retain: 31
   task: snapshot
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: fs-trim
+  namespace: longhorn-system
+spec:
+  concurrency: 1
+  cron: 0 0 ? * SUN
+  groups:
+    - default
+  labels:
+    job: fs-trim
+  name: fs-trim
+  task: filesystem-trim

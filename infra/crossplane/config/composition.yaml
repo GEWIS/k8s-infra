@@ -1,0 +1,97 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: postgres-database
+  labels:
+    provider: cnpg
+spec:
+  compositeTypeRef:
+    apiVersion: databases.gewis.nl/v1alpha1
+    kind: XPostgresDatabase
+  # Intermediate connection secrets for managed resources land here.
+  writeConnectionSecretsToNamespace: crossplane-system
+  resources:
+    - name: role
+      base:
+        apiVersion: postgresql.sql.crossplane.io/v1alpha1
+        kind: Role
+        spec:
+          forProvider:
+            privileges:
+              login: true
+              createDb: false
+              createRole: false
+              superUser: false
+              inherit: true
+          providerConfigRef:
+            name: db-provider
+          writeConnectionSecretToRef:
+            namespace: crossplane-system
+            name: placeholder # patched to <composite-uid>-role
+      patches:
+        # Use the claim name as the PostgreSQL role name (external name).
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.claimRef.name
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+        # Allow overriding the role name via databaseName parameter.
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.databaseName
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+          policy:
+            fromFieldPath: Optional
+        # Unique connection secret name per composite instance.
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.uid
+          toFieldPath: spec.writeConnectionSecretToRef.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-role"
+      connectionDetails:
+        - type: FromConnectionSecretKey
+          name: username
+          fromConnectionSecretKey: username
+        - type: FromConnectionSecretKey
+          name: password
+          fromConnectionSecretKey: password
+        - type: FromValue
+          name: host
+          value: postgres-rw.postgres.svc.cluster.local
+        - type: FromValue
+          name: port
+          value: "5432"
+
+    - name: database
+      base:
+        apiVersion: postgresql.sql.crossplane.io/v1alpha1
+        kind: Database
+        spec:
+          forProvider:
+            owner: placeholder # patched to claim name / databaseName
+          providerConfigRef:
+            name: db-provider
+      patches:
+        # Use the claim name as the PostgreSQL database name (external name).
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.claimRef.name
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+        # Allow overriding via databaseName parameter.
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.databaseName
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+          policy:
+            fromFieldPath: Optional
+        # Set the database owner to the same name as the role.
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.claimRef.name
+          toFieldPath: spec.forProvider.owner
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.databaseName
+          toFieldPath: spec.forProvider.owner
+          policy:
+            fromFieldPath: Optional
+      connectionDetails:
+        # Expose the actual database name (external name) in the connection secret.
+        - type: FromFieldPath
+          name: database
+          fromFieldPath: metadata.annotations[crossplane.io/external-name]

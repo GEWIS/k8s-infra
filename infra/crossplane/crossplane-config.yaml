@@ -1,0 +1,15 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: crossplane-config
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: infrastructure
+  interval: 1h
+  retryInterval: 30s
+  path: ./infra/crossplane/config
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

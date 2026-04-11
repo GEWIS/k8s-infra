@@ -1,0 +1,88 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: postgres-database
+  labels:
+    provider: cnpg
+spec:
+  compositeTypeRef:
+    apiVersion: databases.gewis.nl/v1alpha1
+    kind: PostgresDatabase
+  mode: Pipeline
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        writeConnectionSecretToRef:
+          patches:
+            - fromFieldPath: metadata.namespace
+              toFieldPath: name
+              transforms:
+                - type: string
+                  string:
+                    type: Format
+                    fmt: "db-%s-credentials"
+        resources:
+          - name: role
+            base:
+              apiVersion: postgresql.sql.m.crossplane.io/v1alpha1
+              kind: Role
+              spec:
+                forProvider:
+                  privileges:
+                    login: true
+                    inherit: true
+                providerConfigRef:
+                  name: db-provider
+                  kind: ClusterProviderConfig
+                writeConnectionSecretToRef: {}
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.namespace
+                toFieldPath: metadata.annotations[crossplane.io/external-name]
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: spec.writeConnectionSecretToRef.name
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "%s-role"
+            connectionDetails:
+              - type: FromConnectionSecretKey
+                name: DB_USER
+                fromConnectionSecretKey: username
+              - type: FromConnectionSecretKey
+                name: DB_PASSWORD
+                fromConnectionSecretKey: password
+              - type: FromValue
+                name: DB_HOST
+                value: "postgres-rw.postgres.svc.cluster.local"
+              - type: FromValue
+                name: DB_PORT
+                value: "5432"
+
+          - name: database
+            base:
+              apiVersion: postgresql.sql.m.crossplane.io/v1alpha1
+              kind: Database
+              spec:
+                forProvider:
+                  owner: placeholder
+                providerConfigRef:
+                  name: db-provider
+                  kind: ClusterProviderConfig
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.namespace
+                toFieldPath: metadata.annotations[crossplane.io/external-name]
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.namespace
+                toFieldPath: spec.forProvider.owner
+            connectionDetails:
+              - type: FromFieldPath
+                name: DB_NAME
+                fromFieldPath: metadata.annotations[crossplane.io/external-name]

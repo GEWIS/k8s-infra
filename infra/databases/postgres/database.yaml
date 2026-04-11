@@ -6,11 +6,15 @@ metadata:
 spec:
   instances: 1
   imageName: ghcr.io/cloudnative-pg/postgresql:17
+  enableSuperuserAccess: true
 
   inheritedMetadata:
     labels:
       recurring-job.longhorn.io/source: enabled
       recurring-job.longhorn.io/fs-trim: enabled
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: crossplane-system
 
   storage:
     size: 20Gi

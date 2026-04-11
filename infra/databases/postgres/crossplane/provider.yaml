@@ -1,0 +1,41 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-sql
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/provider-sql:v0.14.0
+  runtimeConfigRef:
+    name: sql-provider-runtime-config
+---
+# We hardcode a lot of stuff here, since the provider config expects different keys
+# in the secret. This is for some reason not configurable
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: sql-provider-runtime-config
+spec:
+  deploymentTemplate:
+    spec:
+      selector:
+        matchLabels: {}
+      template:
+        spec:
+          containers:
+            - name: package-runtime
+              env:
+                - name: PGHOST
+                  value: "postgres-rw.postgres.svc.cluster.local"
+                - name: PGPORT
+                  value: "5432"
+                - name: PGSSLMODE
+                  value: "require"
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-superuser-mirror
+                      key: user
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-superuser-mirror
+                      key: password

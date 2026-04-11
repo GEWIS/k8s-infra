@@ -1,0 +1,6 @@
+apiVersion: databases.gewis.nl/v1alpha1
+kind: PostgresDatabase
+metadata:
+  name: database
+  namespace: netbird
+spec: {}

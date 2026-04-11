@@ -39,6 +39,12 @@ spec:
               name: netbird-config
             - mountPath: /var/lib/netbird
               name: netbird-data
+          envFrom:
+            - secretRef:
+                name: db-netbird-credentials
+          env:
+            - name: NETBIRD_STORE_ENGINE_POSTGRES_DSN
+              value: "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=require"
       volumes:
         - name: netbird-config
           secret:
@@ -90,31 +96,32 @@ spec:
     - nb.gewis.nl
   rules:
     - matches:
-      - path:
-          type: PathPrefix
-          value: /relay
-      - path:
-          type: PathPrefix
-          value: /ws-proxy
-      - path:
-          type: PathPrefix
-          value: /oauth2
-      - path:
-          type: PathPrefix
-          value: /api
+        - path:
+            type: PathPrefix
+            value: /relay
+        - path:
+            type: PathPrefix
+            value: /ws-proxy
+        - path:
+            type: PathPrefix
+            value: /oauth2
+        - path:
+            type: PathPrefix
+            value: /api
       backendRefs:
         - name: netbird-service
           port: 80
     - matches:
-      - path:
-          type: PathPrefix
-          value: /signalexchange.SignalExchange
-      - path:
-          type: PathPrefix
-          value: /management.ManagementService
-      - path:
-          type: PathPrefix
-          value: /management.ProxyService
+        - path:
+            type: PathPrefix
+            value: /signalexchange.SignalExchange
+        - path:
+            type: PathPrefix
+            value: /management.ManagementService
+        - path:
+            type: PathPrefix
+            value: /management.ProxyService
       backendRefs:
         - name: netbird-service
           port: 81
+

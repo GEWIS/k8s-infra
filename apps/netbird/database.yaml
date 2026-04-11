@@ -1,0 +1,8 @@
+apiVersion: databases.gewis.nl/v1alpha1
+kind: PostgresDatabase
+metadata:
+  name: netbird
+  namespace: netbird
+spec:
+  writeConnectionSecretToRef:
+    name: netbird-db-credentials

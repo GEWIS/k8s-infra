@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - helm-repo.yaml
   - helm-release.yaml
+  - provider.yaml
   - crossplane-config.yaml

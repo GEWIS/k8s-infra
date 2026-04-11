@@ -6,6 +6,7 @@ metadata:
 spec:
   dependsOn:
     - name: infrastructure
+    - name: crossplane-config
   interval: 1h
   retryInterval: 1m
   path: ./apps

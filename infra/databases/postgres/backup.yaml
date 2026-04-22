@@ -4,7 +4,7 @@ metadata:
   name: postgres-backup
   namespace: postgres
 spec:
-  schedule: "0 0 3 * * *"
+  schedule: "0 30 3 * * *"
   cluster:
     name: postgres
   method: volumeSnapshot

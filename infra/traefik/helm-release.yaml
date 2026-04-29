@@ -44,6 +44,7 @@ spec:
         forwardedHeaders:
           trustedIPs:
             - "10.82.50.107"
+            - "145.116.44.122"
         transport:
           respondingTimeouts:
             readTimeout: 0

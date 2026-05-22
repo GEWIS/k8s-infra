@@ -51,6 +51,12 @@ spec:
         fsGroup: 10001
         runAsGroup: 10001
         runAsUser: 10001
+      compactor:
+        retention_enabled: true
+        delete_request_store: filesystem
+
+      limits_config:
+        retention_period: 24h
 
     singleBinary:
       replicas: 1

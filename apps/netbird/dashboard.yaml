@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
         - name: dashboard
-          image: netbirdio/dashboard:v2.38.0
+          image: netbirdio/dashboard:v2.38.1
           ports:
             - containerPort: 80
           envFrom: 

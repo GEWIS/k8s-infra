@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gewismail
+  namespace: external-proxy
+spec:
+  type: ExternalName
+  externalName: gewismail.net.gewis.nl
+  ports:
+    - name: https
+      port: 443
+      protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: gewismail
+  namespace: external-proxy
+spec:
+  insecureSkipVerify: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gewismail
+  namespace: external-proxy
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`mail.gewis.nl`)
+      services:
+        - name: gewismail
+          port: 443
+          scheme: https
+          passHostHeader: true
+          serversTransport: gewismail

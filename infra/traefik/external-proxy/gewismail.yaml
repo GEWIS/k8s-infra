@@ -29,7 +29,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`mail.gewis.nl`)
+      match: Host(`mail.gewis.nl`) || Host(`lists.gewis.nl`) || Host(`webmail.gewis.nl`)
       services:
         - name: gewismail
           port: 443

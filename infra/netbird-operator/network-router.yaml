@@ -1,0 +1,8 @@
+apiVersion: netbird.io/v1alpha1
+kind: NetworkRouter
+metadata:
+  name: gewis-prod
+  namespace: netbird
+spec:
+  dnsZoneRef:
+    name: net.nb.gewis.nl

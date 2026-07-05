@@ -1,0 +1,13 @@
+apiVersion: netbird.io/v1alpha1
+kind: NetworkResource
+metadata:
+  name: loki-gateway
+  namespace: observability
+spec:
+  networkRouterRef:
+    name: gewis-prod
+    namespace: netbird
+  serviceRef:
+    name: loki-gateway
+  groups:
+    - name: kubernetes-services

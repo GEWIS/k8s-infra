@@ -10,6 +10,9 @@ spec:
     - name: https
       port: 443
       protocol: TCP
+    - name: http-lists
+      port: 8000
+      protocol: TCP
 ---
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
@@ -29,10 +32,17 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`mail.gewis.nl`) || Host(`lists.gewis.nl`) || Host(`webmail.gewis.nl`)
+      match: Host(`mail.gewis.nl`) || Host(`webmail.gewis.nl`)
       services:
         - name: gewismail
           port: 443
           scheme: https
           passHostHeader: true
           serversTransport: gewismail
+    - kind: Rule
+      match: Host(`lists.gewis.nl`)
+      services:
+        - name: gewismail
+          port: 8000
+          scheme: http
+          passHostHeader: true

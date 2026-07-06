@@ -1,0 +1,13 @@
+apiVersion: netbird.io/v1alpha1
+kind: NetworkResource
+metadata:
+  name: coredns
+  namespace: coredns
+spec:
+  networkRouterRef:
+    name: k3s-network
+    namespace: netbird
+  serviceRef:
+    name: coredns-coredns
+  groups:
+    - name: All

@@ -47,6 +47,14 @@ spec:
       port: 9825
       protocol: TCP
       targetPort: 9825
+    - name: analytics
+      port: 9212
+      protocol: TCP
+      targetPort: 9212
+    - name: analytics-test
+      port: 9202
+      protocol: TCP
+      targetPort: 9202
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -156,5 +164,25 @@ spec:
                 name: gewiscontainer
                 port:
                   number: 9411
+            path: /
+            pathType: Prefix
+    - host: analytics.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: gewiscontainer
+                port:
+                  number: 9212
+            path: /
+            pathType: Prefix
+    - host: analytics.test.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: gewiscontainer
+                port:
+                  number: 9202
             path: /
             pathType: Prefix

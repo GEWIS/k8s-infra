@@ -32,12 +32,11 @@ spec:
       plugins:
       - name: errors
       - name: health
-      - name: health
         configBlock: |-
           lameduck 10s
       - name: ready
       - name: forward
-        parameters: . 1.1.1.1 1.0.0.1
+        parameters: . 131.155.3.3 131.155.2.3
         configBlock: |-
           policy sequential
       - name: cache

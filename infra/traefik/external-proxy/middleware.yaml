@@ -21,3 +21,13 @@ spec:
       - 131.155.32.0/19
       - 131.155.64.0/18
       - 131.155.128.0/17
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: planka-headers
+  namespace: planka
+spec:
+  headers:
+    customResponseHeaders:
+      X-Frame-Options: "SAMEORIGIN"

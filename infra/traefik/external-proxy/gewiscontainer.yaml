@@ -55,6 +55,14 @@ spec:
       port: 9202
       protocol: TCP
       targetPort: 9202
+    - name: xoa
+      port: 9405
+      protocol: TCP
+      targetPort: 9405
+    - name: planka
+      port: 9825
+      protocol: TCP
+      targetPort: 9825
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -184,5 +192,29 @@ spec:
                 name: gewiscontainer
                 port:
                   number: 9202
+            path: /
+            pathType: Prefix
+    - host: xoa.gewis.nl
+      http:
+        paths:
+          - backend:
+              middlewares:
+                - name: tue-only
+              service:
+                name: gewiscontainer
+                port:
+                  number: 9405
+            path: /
+            pathType: Prefix
+    - host: planka.gewis.nl
+      http:
+        paths:
+          - backend:
+              middlewares:
+                - name: planka-headers
+              service:
+                name: gewiscontainer
+                port:
+                  number: 9825
             path: /
             pathType: Prefix

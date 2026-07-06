@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gewisweb
+  namespace: external-proxy
+spec:
+  type: ExternalName
+  externalName: gewisweb.net.gewis.nl
+  ports:
+    - name: phpmyadmin
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+    - name: pgadmin
+      port: 9411
+      protocol: TCP
+      targetPort: 9411
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gewisweb
+  namespace: external-proxy
+spec:
+  routes:
+    - kind: Rule
+      match: Host(`phpmyadmin.gewis.nl`)
+      middlewares:
+        - name: tue-only
+      services:
+        - name: gewisweb
+          port: 8081
+          scheme: http

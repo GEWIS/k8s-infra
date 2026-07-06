@@ -31,6 +31,10 @@ spec:
       port: 9860
       protocol: TCP
       targetPort: 9860
+    - name: pgadmin
+      port: 9411
+      protocol: TCP
+      targetPort: 9411
     - name: supremum
       port: 9501
       protocol: TCP
@@ -149,5 +153,17 @@ spec:
                 name: gewiscontainer
                 port:
                   number: 9501
+            path: /
+            pathType: Prefix
+    - host: pgadmin.gewis.nl
+      http:
+        paths:
+          - backend:
+              middlewares:
+                - name: tue-only
+              service:
+                name: gewiscontainer
+                port:
+                  number: 9411
             path: /
             pathType: Prefix

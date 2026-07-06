@@ -27,8 +27,21 @@ spec:
     servers:
     - zones:
       - zone: .
+        use_tcp: true
+      port: 53
       plugins:
+      - name: errors
+      - name: health
+      - name: health
+        configBlock: |-
+          lameduck 10s
+      - name: ready
       - name: forward
         parameters: . 1.1.1.1 1.0.0.1
         configBlock: |-
           policy sequential
+      - name: cache
+        parameters: 30
+      - name: loop
+      - name: reload
+      - name: loadbalance

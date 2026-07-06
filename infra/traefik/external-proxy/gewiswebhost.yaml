@@ -20,6 +20,14 @@ spec:
   serverName: cbc.gewis.nl
 ---
 apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: stijl-gewis-nl-transport
+  namespace: external-proxy
+spec:
+  serverName: stijl.gewis.nl
+---
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: cbc-gewis-nl

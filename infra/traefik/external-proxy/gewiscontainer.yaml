@@ -71,6 +71,14 @@ spec:
       port: 9001
       protocol: TCP
       targetPort: 9001
+    - name: gewisweb
+      port: 9210
+      protocol: TCP
+      targetPort: 9210
+    - name: gewisweb-images
+      port: 9211
+      protocol: TCP
+      targetPort: 9211
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

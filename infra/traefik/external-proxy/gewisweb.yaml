@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gewisweb
+  namespace: external-proxy
+spec:
+  type: ExternalName
+  externalName: gewisweb.net.gewis.nl
+  ports:
+    - name: phpmyadmin
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+    - name: pgadmin
+      port: 9411
+      protocol: TCP
+      targetPort: 9411
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: tue-only
+  namespace: external-proxy
+spec:
+  ipAllowList:
+    sourceRange:
+      - 100.64.0.0/10
+      # 131.155.0.0/16 minus 131.155.10.0/27 and 131.155.10.128/27
+      # TODO: remove after waf is gone
+      - 131.155.0.0/21
+      - 131.155.8.0/23
+      - 131.155.10.32/27
+      - 131.155.10.64/26
+      - 131.155.10.160/27
+      - 131.155.10.192/26
+      - 131.155.11.0/24
+      - 131.155.12.0/22
+      - 131.155.16.0/20
+      - 131.155.32.0/19
+      - 131.155.64.0/18
+      - 131.155.128.0/17
+---
+kind: IngressRoute
+metadata:
+  name: gewisweb
+  namespace: external-proxy
+spec:
+  routes:
+    - kind: Rule
+      match: Host(`phpmyadmin.gewis.nl`)
+      middlewares:
+        - name: tue-only
+      services:
+        - name: gewisweb
+          port: 8081
+          scheme: http
+    - kind: Rule
+      match: Host(`pgadmin.gewis.nl`)
+      middlewares:
+        - name: tue-only
+      services:
+        - name: gewisweb
+          port: 9411
+          scheme: http

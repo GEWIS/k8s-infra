@@ -51,25 +51,6 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: docker-gewis-root
-  namespace: external-proxy
-spec:
-  ingressClassName: traefik
-  rules:
-    - host: docker.gewis.nl
-      http:
-        paths:
-          - backend:
-              service:
-                name: gewiscontainer
-                port:
-                  number: 9000
-            path: /
-            pathType: Prefix
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
   name: gewiscontainer
   namespace: external-proxy
 spec:
@@ -153,6 +134,16 @@ spec:
                 name: gewiscontainer
                 port:
                   number: 9501
+            path: /
+            pathType: Prefix
+    - host: docker.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: gewiscontainer
+                port:
+                  number: 9000
             path: /
             pathType: Prefix
     - host: pgadmin.gewis.nl

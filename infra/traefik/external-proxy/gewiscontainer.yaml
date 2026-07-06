@@ -5,7 +5,7 @@ metadata:
   namespace: external-proxy
 spec:
   type: ExternalName
-  externalName: gewiscontainer
+  externalName: gewiscontainer.net.gewis.nl
   ports:
     - name: ivv
       port: 9851

@@ -1,3 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns-coredns-clusterip
+  namespace: coredns
+spec:
+  type: ClusterIP
+  ports:
+    - name: udp
+      port: 53
+      protocol: UDP
+    - name: tcp
+      port: 53
+      protocol: TCP
+  selector:
+    app.kubernetes.io/instance: coredns-coredns
+    app.kubernetes.io/name: coredns
+---
 apiVersion: netbird.io/v1alpha1
 kind: NetworkResource
 metadata:
@@ -8,6 +27,6 @@ spec:
     name: k3s-network
     namespace: netbird
   serviceRef:
-    name: coredns-coredns
+    name: coredns-coredns-clusterip
   groups:
     - name: All

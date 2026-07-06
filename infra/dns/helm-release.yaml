@@ -23,3 +23,12 @@ spec:
     crds: CreateReplace
   values:
     isClusterService: false
+    serviceType: LoadBalancer
+    servers:
+    - zones:
+      - zone: .
+      plugins:
+      - name: forward
+        parameters: . 1.1.1.1 1.0.0.1
+        configBlock: |-
+          policy sequential

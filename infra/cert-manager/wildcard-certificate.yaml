@@ -14,3 +14,4 @@ spec:
     - gew.is
     - "*.gew.is"
     - "*.test.gewis.nl"
+    - "*.personal.gewis.nl"

@@ -43,10 +43,6 @@ spec:
       port: 9000
       protocol: TCP
       targetPort: 9000
-    - name: planka
-      port: 9825
-      protocol: TCP
-      targetPort: 9825
     - name: analytics
       port: 9212
       protocol: TCP
@@ -63,6 +59,10 @@ spec:
       port: 9825
       protocol: TCP
       targetPort: 9825
+    - name: vaultwarden
+      port: 9401
+      protocol: TCP
+      targetPort: 9401
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -216,5 +216,15 @@ spec:
                 name: gewiscontainer
                 port:
                   number: 9825
+            path: /
+            pathType: Prefix
+    - host: vault.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: gewiscontainer
+                port:
+                  number: 9401
             path: /
             pathType: Prefix

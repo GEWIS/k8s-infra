@@ -48,13 +48,12 @@ spec:
         transport:
           respondingTimeouts:
             readTimeout: 0
-    logs:
-      access:
-        enabled: true
-        format: "json"
-        fields:
-          headers:
-            defaultmode: keep
+    accessLogs:
+      enabled: true
+      format: "json"
+      fields:
+        headers:
+          defaultmode: keep
     ingressRoute:
       dashboard:
         enabled: true

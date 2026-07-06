@@ -1,0 +1,82 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: gewisweb-cors
+  namespace: external-proxy
+spec:
+  headers:
+    accessControlAllowOriginListRegex:
+      - "^https?://(.*\\.)?gewis\\.nl$"
+      - "^https?://(.*\\.)?win\\.tue\\.nl$"
+      - "^https?://localhost:8080$"
+    accessControlAllowMethods:
+      - GET
+      - POST
+      - OPTIONS
+      - DELETE
+      - PUT
+    accessControlAllowCredentials: true
+    accessControlAllowHeaders:
+      - User-Agent
+      - Keep-Alive
+      - Content-Type
+    # Strip upstream CORS headers before re-adding our own
+    customResponseHeaders:
+      Access-Control-Allow-Origin: ""
+      Access-Control-Allow-Methods: ""
+      Access-Control-Allow-Credentials: ""
+      Access-Control-Allow-Headers: ""
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: corporateidentity-headers
+  namespace: external-proxy
+spec:
+  headers:
+    customRequestHeaders:
+      Host: "stijl.gewis.nl"
+    customResponseHeaders:
+      Upgrade: ""
+---
+# gewis.nl — main site
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gewis
+  namespace: external-proxy
+spec:
+  routes:
+    - kind: Rule
+      match: Host(`gewis.nl`) && PathPrefix(`/corporateidentity`)
+      middlewares:
+        - name: gewisweb-cors
+        - name: corporateidentity-headers
+      services:
+        - name: gewiswebhost
+          port: 443
+          scheme: https
+          serversTransport: stijl-gewis-nl-transport
+    - kind: Rule
+      match: Host(`gewis.nl`)
+      middlewares:
+        - name: gewisweb-cors
+      services:
+        - name: gewiscontainer
+          port: 9210
+          scheme: http
+---
+# images.gewis.nl
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: images-gewis
+  namespace: external-proxy
+spec:
+  routes:
+    - kind: Rule
+      match: Host(`images.gewis.nl`)
+      services:
+        - name: gewiscontainer
+          port: 9211
+          scheme: http

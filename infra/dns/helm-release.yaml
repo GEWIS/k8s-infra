@@ -36,7 +36,7 @@ spec:
           lameduck 10s
       - name: ready
       - name: forward
-        parameters: . 131.155.3.3 131.155.2.3
+        parameters: . https://noads.joindns4.eu/dns-query
         configBlock: |-
           policy sequential
       - name: cache
@@ -44,3 +44,23 @@ spec:
       - name: loop
       - name: reload
       - name: loadbalance
+    - zones:
+      - zone: gewiswg.gewis.nl
+        use_tcp: true
+      port: 53
+      plugins:
+      - name: errors
+      - name: health
+        configBlock: |-
+          lameduck 10s
+      - name: ready
+      - name: forward
+        parameters: . dns://gewisdc02 dns://gewisdc03
+        configBlock: |-
+          policy sequential
+      - name: cache
+        parameters: 30
+      - name: loop
+      - name: reload
+      - name: loadbalance
+

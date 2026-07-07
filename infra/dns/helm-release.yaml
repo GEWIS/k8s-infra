@@ -36,26 +36,11 @@ spec:
           lameduck 10s
       - name: ready
       - name: forward
-        parameters: . https://noads.joindns4.eu/dns-query
+        parameters: gewiswg.gewis.nl 10.64.123.42 10.64.226.22
         configBlock: |-
           policy sequential
-      - name: cache
-        parameters: 30
-      - name: loop
-      - name: reload
-      - name: loadbalance
-    - zones:
-      - zone: gewiswg.gewis.nl
-        use_tcp: true
-      port: 53
-      plugins:
-      - name: errors
-      - name: health
-        configBlock: |-
-          lameduck 10s
-      - name: ready
       - name: forward
-        parameters: . dns://gewisdc02 dns://gewisdc03
+        parameters: . 86.54.11.13 86.54.11.213
         configBlock: |-
           policy sequential
       - name: cache

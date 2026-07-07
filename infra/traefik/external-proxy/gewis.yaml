@@ -55,7 +55,8 @@ spec:
       services:
         - name: gewiswebhost
           port: 443
-          scheme: http
+          scheme: https
+          serversTransport: stijl-gewis-nl-transport
     - kind: Rule
       match: Host(`gewis.nl`)
       middlewares:

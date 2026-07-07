@@ -1,0 +1,169 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: containerhost
+  namespace: external-proxy
+spec:
+  type: ExternalName
+  externalName: containerhost.gewis.nl
+  ports:
+    - name: default
+      port: 9101
+      protocol: TCP
+      targetPort: 9101
+    - name: abc
+      port: 9102
+      protocol: TCP
+      targetPort: 9102
+    - name: board
+      port: 9103
+      protocol: TCP
+      targetPort: 9103
+    - name: cbc
+      port: 9104
+      protocol: TCP
+      targetPort: 9104
+    - name: supremum
+      port: 9107
+      protocol: TCP
+      targetPort: 9107
+    - name: avico
+      port: 9108
+      protocol: TCP
+      targetPort: 9108
+    - name: celerit
+      port: 9110
+      protocol: TCP
+      targetPort: 9110
+    - name: pdf
+      port: 9111
+      protocol: TCP
+      targetPort: 9111
+    - name: ivv
+      port: 9112
+      protocol: TCP
+      targetPort: 9112
+---
+# Ensure Docker-Distribution-Api-Version is always set for clients that check it.
+# The upstream registry sets this header itself; this middleware is a safety net
+# for any path where the header might be stripped (e.g. future auth middleware).
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: docker-registry-headers
+  namespace: external-proxy
+spec:
+  headers:
+    customResponseHeaders:
+      Docker-Distribution-Api-Version: "registry/2.0"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docker-registry
+  namespace: external-proxy
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: external-proxy-docker-registry-headers@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9101
+            path: /
+            pathType: Prefix
+    - host: default.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9101
+            path: /
+            pathType: Prefix
+    - host: abc.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9102
+            path: /
+            pathType: Prefix
+    - host: board.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9103
+            path: /
+            pathType: Prefix
+    - host: cbc.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9104
+            path: /
+            pathType: Prefix
+    - host: supremum.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9107
+            path: /
+            pathType: Prefix
+    - host: avico.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9108
+            path: /
+            pathType: Prefix
+    - host: celerit.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9110
+            path: /
+            pathType: Prefix
+    - host: pdf.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9111
+            path: /
+            pathType: Prefix
+    - host: ivv.docker-registry.gewis.nl
+      http:
+        paths:
+          - backend:
+              service:
+                name: containerhost
+                port:
+                  number: 9112
+            path: /
+            pathType: Prefix

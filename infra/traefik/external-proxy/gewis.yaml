@@ -66,6 +66,34 @@ spec:
           port: 9210
           scheme: http
 ---
+# www.gewis.nl — redirect to apex
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-www-gewis
+  namespace: external-proxy
+spec:
+  redirectRegex:
+    regex: "^https://www\\.gewis\\.nl(.*)"
+    replacement: "https://gewis.nl${1}"
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: www-gewis
+  namespace: external-proxy
+spec:
+  routes:
+    - kind: Rule
+      match: Host(`www.gewis.nl`)
+      middlewares:
+        - name: redirect-www-gewis
+      services:
+        - name: gewiscontainer
+          port: 9210
+          scheme: http
+---
 # images.gewis.nl
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute

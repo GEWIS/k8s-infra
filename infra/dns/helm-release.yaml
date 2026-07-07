@@ -23,7 +23,12 @@ spec:
     crds: CreateReplace
   values:
     isClusterService: false
+    replicaCount: 3
     serviceType: LoadBalancer
+    image:
+      # Use the image provided by K3s
+      repository: "docker.io/rancher/mirrored-coredns-coredns"
+      tag: "1.14.4"
     servers:
     - zones:
       - zone: .
@@ -36,11 +41,11 @@ spec:
           lameduck 10s
       - name: ready
       - name: forward
-        parameters: gewiswg.gewis.nl 10.64.123.42 10.64.226.22
+        parameters: gewiswg.gewis.nl 10.82.40.22 10.82.40.23
         configBlock: |-
           policy sequential
       - name: forward
-        parameters: . 86.54.11.13 86.54.11.213
+        parameters: . 131.155.2.3 131.155.3.3
         configBlock: |-
           policy sequential
       - name: cache

@@ -5,7 +5,7 @@ metadata:
   namespace: external-proxy
 spec:
   type: ExternalName
-  externalName: containerhost.gewis.nl
+  externalName: gewiscontainer.net.gewis.nl
   ports:
     - name: default
       port: 9101

@@ -53,4 +53,23 @@ spec:
       - name: loop
       - name: reload
       - name: loadbalance
-
+---
+# add a second interface to get a second LB IP as many
+# devices expect at least two DNS servers
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns-coredns-2
+  namespace: coredns
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/instance: coredns-coredns
+    app.kubernetes.io/name: coredns
+  ports:
+  - name: udp-53
+    port: 53
+    protocol: UDP
+  - name: tcp-53
+    port: 53
+    protocol: TCP

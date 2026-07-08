@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reverse-proxy
+  namespace: netbird
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: netbird-reverse-proxy
+  template:
+    metadata:
+      labels:
+        app: netbird-reverse-proxy
+    spec:
+      containers:
+        - name: proxy
+          image: netbirdio/reverse-proxy:0.74.3
+          env:
+            - name: NB_PROXY_DOMAIN
+              value: proxy.gewis.nl
+            - name: NB_PROXY_MANAGEMENT_ADDRESS
+              value: http://netbird-service:81
+            - name: NB_PROXY_ALLOW_INSECURE
+              value: "true"
+            - name: NB_PROXY_PRIVATE
+              value: "true"
+            - name: NB_PROXY_ADDRESS
+              value: ":8443"
+            - name: NB_PROXY_ACME_CERTIFICATES
+              value: "false"
+            - name: NB_PROXY_CERTIFICATE_DIRECTORY
+              value: /certs
+            - name: NB_PROXY_HEALTH_ADDRESS
+              value: ":8080"
+            - name: NB_PROXY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: netbird-reverse-proxy-token
+                  key: NB_PROXY_TOKEN
+          ports:
+            - name: proxy-tls
+              containerPort: 8443
+            - name: health
+              containerPort: 8080
+          volumeMounts:
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /healthz/startup
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 8080
+      volumes:
+        - name: certs
+          secret:
+            secretName: netbird-reverse-proxy-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: netbird-reverse-proxy
+  namespace: netbird
+spec:
+  selector:
+    app: netbird-reverse-proxy
+  ports:
+    - name: proxy-tls
+      port: 8443
+      targetPort: 8443

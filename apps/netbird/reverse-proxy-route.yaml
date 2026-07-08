@@ -1,0 +1,23 @@
+---
+# Raw TLS passthrough: Traefik must NOT terminate TLS for proxy services —
+# the netbird proxy serves the *.gewis.nl wildcard cert itself and does SSO.
+# SNI-matched on websecure (:443), forwarded untouched to the proxy on :8443.
+#
+# Each exposed host MUST be listed here explicitly. A wildcard HostSNI would
+# hijack every Traefik-terminated router (dashboard + existing apps), so add
+# one match line per new proxy service. Never use HostSNI(`*.gewis.nl`).
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: netbird-reverse-proxy
+  namespace: netbird
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostSNI(`print.gewis.nl`)
+      services:
+        - name: netbird-reverse-proxy
+          port: 8443
+  tls:
+    passthrough: true

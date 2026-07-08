@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: netbird-reverse-proxy
+  namespace: netbird
+spec:
+  secretName: netbird-reverse-proxy-tls
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.gewis.nl"
+    - gewis.nl

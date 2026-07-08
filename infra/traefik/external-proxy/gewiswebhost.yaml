@@ -14,11 +14,12 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
 metadata:
-  name: cbc-gewis-nl-transport
+  name: gewiswebhost
   namespace: external-proxy
 spec:
-  serverName: cbc.gewis.nl
+  insecureSkipVerify: true
 ---
+# Used by the gewis.nl/corporateidentity route in gewis.yaml
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
 metadata:
@@ -31,14 +32,51 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: cbc-gewis-nl
+  name: gewiswebhost
   namespace: external-proxy
 spec:
+  entryPoints:
+    - websecure
   routes:
     - kind: Rule
-      match: Host(`cbc.gewis.nl`)
+      match: >-
+        Host(`personal.gewis.nl`) ||
+        Host(`mta-sts.gewis.nl`) ||
+        Host(`webhost-auth.gewis.nl`) ||
+        Host(`vz.personal.gewis.nl`) ||
+        Host(`signature.gewis.nl`) ||
+        Host(`secr.personal.gewis.nl`) ||
+        Host(`rink.personal.gewis.nl`) ||
+        Host(`pm.personal.gewis.nl`) ||
+        Host(`fse.gewis.nl`) ||
+        Host(`co.personal.gewis.nl`) ||
+        Host(`cib.personal.gewis.nl`) ||
+        Host(`cbc.gewis.nl`) ||
+        Host(`board.gewis.nl`) ||
+        Host(`infoscherm.gewis.nl`) ||
+        Host(`ceb.personal.gewis.nl`) ||
+        Host(`femke.personal.gewis.nl`) ||
+        Host(`9eglinster.gewis.nl`) ||
+        Host(`geglinster.gewis.nl`) ||
+        Host(`boom.gewis.nl`) ||
+        Host(`athena.gewis.nl`) ||
+        Host(`avico.gewis.nl`) ||
+        Host(`bac.gewis.nl`) ||
+        Host(`defi.gewis.nl`) ||
+        Host(`gehack.gewis.nl`) ||
+        Host(`gezwem.gewis.nl`) ||
+        Host(`inf.gewis.nl`) ||
+        Host(`info.gewis.nl`) ||
+        Host(`intro.gewis.nl`) ||
+        Host(`intro25.gewis.nl`) ||
+        Host(`linkinbio.gewis.nl`) ||
+        Host(`odc.gewis.nl`) ||
+        Host(`static.gewis.nl`) ||
+        Host(`ssg.gewis.nl`) ||
+        Host(`stijl.gewis.nl`)
       services:
         - name: gewiswebhost
           port: 443
           scheme: https
-          serversTransport: cbc-gewis-nl-transport
+          passHostHeader: true
+          serversTransport: gewiswebhost

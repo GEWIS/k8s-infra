@@ -10,6 +10,9 @@ spec:
     - name: https
       port: 443
       protocol: TCP
+    - name: mgmt
+      port: 10002
+      protocol: TCP
 ---
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
@@ -80,3 +83,21 @@ spec:
           scheme: https
           passHostHeader: true
           serversTransport: gewiswebhost
+---
+# webhost-mgmt.gewis.nl — webhost admin interface (Webmin on port 10002).
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gewiswebhost-mgmt
+  namespace: external-proxy
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`webhost-mgmt.gewis.nl`)
+      services:
+        - name: gewiswebhost
+          port: 10002
+          scheme: http
+          passHostHeader: false

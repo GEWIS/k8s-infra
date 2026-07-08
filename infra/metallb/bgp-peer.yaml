@@ -1,0 +1,20 @@
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: mikrotik
+  namespace: metallb
+spec:
+  myASN: 65533
+  peerASN: 65534
+  peerAddress: 10.82.50.1
+---
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: mikrotik
+  namespace: metallb
+spec:
+  ipAddressPools:
+  - address-pool
+  peers:
+  - mikrotik

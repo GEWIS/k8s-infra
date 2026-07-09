@@ -103,4 +103,7 @@ spec:
         - name: gewiswebhost
           port: 10002
           scheme: http
-          passHostHeader: false
+          # Webmin builds its post-login redirect from the Host header. Forward
+          # the public host so it redirects to webhost-mgmt.gewis.nl, not the
+          # internal webhost.localnet.gewis.nl:10002 (unreachable from browsers).
+          passHostHeader: true

@@ -5,4 +5,4 @@ metadata:
   namespace: metallb
 spec:
   addresses:
-  - 10.82.51.100-10.82.51.200
+  - 10.82.50.150-10.82.50.199

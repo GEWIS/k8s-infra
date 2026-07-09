@@ -14,15 +14,8 @@ spec:
       port: 10002
       protocol: TCP
 ---
-apiVersion: traefik.io/v1alpha1
-kind: ServersTransport
-metadata:
-  name: gewiswebhost
-  namespace: external-proxy
-spec:
-  insecureSkipVerify: true
----
-# Used by the gewis.nl/corporateidentity route in gewis.yaml
+# Used by the gewis.nl/corporateidentity route in gewis.yaml.
+# That route rewrites Host to stijl.gewis.nl, so SNI must match too (see below).
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
 metadata:
@@ -32,8 +25,19 @@ spec:
   serverName: stijl.gewis.nl
   insecureSkipVerify: true
 ---
+# Raw TLS passthrough for the webhost-served sites.
+#
+# The webhost (openresty) enforces SNI == Host and returns 421 Misdirected
+# Request otherwise. When Traefik terminates and re-encrypts, its outbound SNI
+# is fixed to the ExternalName (webhost.localnet.gewis.nl) and can't match each
+# per-request Host, so every site 421'd. Passthrough forwards the browser's
+# original TLS untouched, so the webhost sees SNI == Host and serves its own
+# per-domain certs.
+#
+# Each host MUST be listed explicitly. A wildcard HostSNI would hijack every
+# Traefik-terminated router (dashboard + apps). Add one HostSNI per new site.
 apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+kind: IngressRouteTCP
 metadata:
   name: gewiswebhost
   namespace: external-proxy
@@ -41,50 +45,49 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - kind: Rule
-      match: >-
-        Host(`personal.gewis.nl`) ||
-        Host(`mta-sts.gewis.nl`) ||
-        Host(`webhost-auth.gewis.nl`) ||
-        Host(`vz.personal.gewis.nl`) ||
-        Host(`signature.gewis.nl`) ||
-        Host(`secr.personal.gewis.nl`) ||
-        Host(`rink.personal.gewis.nl`) ||
-        Host(`pm.personal.gewis.nl`) ||
-        Host(`fse.gewis.nl`) ||
-        Host(`co.personal.gewis.nl`) ||
-        Host(`cib.personal.gewis.nl`) ||
-        Host(`cbc.gewis.nl`) ||
-        Host(`board.gewis.nl`) ||
-        Host(`infoscherm.gewis.nl`) ||
-        Host(`ceb.personal.gewis.nl`) ||
-        Host(`femke.personal.gewis.nl`) ||
-        Host(`9eglinster.gewis.nl`) ||
-        Host(`geglinster.gewis.nl`) ||
-        Host(`boom.gewis.nl`) ||
-        Host(`athena.gewis.nl`) ||
-        Host(`avico.gewis.nl`) ||
-        Host(`bac.gewis.nl`) ||
-        Host(`defi.gewis.nl`) ||
-        Host(`gehack.gewis.nl`) ||
-        Host(`gezwem.gewis.nl`) ||
-        Host(`inf.gewis.nl`) ||
-        Host(`info.gewis.nl`) ||
-        Host(`intro.gewis.nl`) ||
-        Host(`intro25.gewis.nl`) ||
-        Host(`linkinbio.gewis.nl`) ||
-        Host(`odc.gewis.nl`) ||
-        Host(`static.gewis.nl`) ||
-        Host(`ssg.gewis.nl`) ||
-        Host(`stijl.gewis.nl`)
+    - match: >-
+        HostSNI(`personal.gewis.nl`) ||
+        HostSNI(`mta-sts.gewis.nl`) ||
+        HostSNI(`webhost-auth.gewis.nl`) ||
+        HostSNI(`vz.personal.gewis.nl`) ||
+        HostSNI(`signature.gewis.nl`) ||
+        HostSNI(`secr.personal.gewis.nl`) ||
+        HostSNI(`rink.personal.gewis.nl`) ||
+        HostSNI(`pm.personal.gewis.nl`) ||
+        HostSNI(`fse.gewis.nl`) ||
+        HostSNI(`co.personal.gewis.nl`) ||
+        HostSNI(`cib.personal.gewis.nl`) ||
+        HostSNI(`cbc.gewis.nl`) ||
+        HostSNI(`board.gewis.nl`) ||
+        HostSNI(`infoscherm.gewis.nl`) ||
+        HostSNI(`ceb.personal.gewis.nl`) ||
+        HostSNI(`femke.personal.gewis.nl`) ||
+        HostSNI(`9eglinster.gewis.nl`) ||
+        HostSNI(`geglinster.gewis.nl`) ||
+        HostSNI(`boom.gewis.nl`) ||
+        HostSNI(`athena.gewis.nl`) ||
+        HostSNI(`avico.gewis.nl`) ||
+        HostSNI(`bac.gewis.nl`) ||
+        HostSNI(`defi.gewis.nl`) ||
+        HostSNI(`gehack.gewis.nl`) ||
+        HostSNI(`gezwem.gewis.nl`) ||
+        HostSNI(`inf.gewis.nl`) ||
+        HostSNI(`info.gewis.nl`) ||
+        HostSNI(`intro.gewis.nl`) ||
+        HostSNI(`intro25.gewis.nl`) ||
+        HostSNI(`linkinbio.gewis.nl`) ||
+        HostSNI(`odc.gewis.nl`) ||
+        HostSNI(`static.gewis.nl`) ||
+        HostSNI(`ssg.gewis.nl`) ||
+        HostSNI(`stijl.gewis.nl`)
       services:
         - name: gewiswebhost
           port: 443
-          scheme: https
-          passHostHeader: true
-          serversTransport: gewiswebhost
+  tls:
+    passthrough: true
 ---
 # webhost-mgmt.gewis.nl — webhost admin interface (Webmin on port 10002).
+# Plain HTTP backend, so this stays Traefik-terminated (no SNI mismatch).
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:

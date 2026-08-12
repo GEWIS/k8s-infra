@@ -54,12 +54,12 @@ spec:
         protocol: TCP
         expose:
           default: true
-    accessLogs:
+    accessLog:
       enabled: true
       format: "json"
       fields:
         headers:
-          defaultmode: keep
+          defaultMode: keep
     ingressRoute:
       dashboard:
         enabled: true

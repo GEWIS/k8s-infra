@@ -60,7 +60,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: 'PathPrefix(`/__gatetest`) && !HeaderRegexp(`Cookie`, `(^|;\s*)gewis-gate=open(;|$)`) && !Host(`cbc-bbq.gewis.nl`) && !Host(`restreamer.gewis.nl`)'
+      match: '!HeaderRegexp(`Cookie`, `(^|;\s*)gewis-gate=open(;|$)`) && !Host(`cbc-bbq.gewis.nl`) && !Host(`restreamer.gewis.nl`)'
       priority: 2000000
       middlewares:
         - name: gate-redirect

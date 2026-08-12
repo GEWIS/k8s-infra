@@ -48,6 +48,12 @@ spec:
         transport:
           respondingTimeouts:
             readTimeout: 0
+      rtmp:
+        port: 1935
+        exposedPort: 1935
+        protocol: TCP
+        expose:
+          default: true
     accessLogs:
       enabled: true
       format: "json"

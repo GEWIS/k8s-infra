@@ -44,7 +44,8 @@ spec:
         forwardedHeaders:
           trustedIPs:
             - "10.82.50.107"
-            - "145.116.44.122"
+            - "145.116.44.49" #Geproxy
+            - "145.116.47.68" #Geproxy in Atlas
         transport:
           respondingTimeouts:
             readTimeout: 0

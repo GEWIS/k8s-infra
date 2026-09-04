@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: proxy
-          image: netbirdio/reverse-proxy:0.74.3
+          image: netbirdio/reverse-proxy:0.78.1
           env:
             - name: NB_PROXY_DOMAIN
               value: proxy.gewis.nl

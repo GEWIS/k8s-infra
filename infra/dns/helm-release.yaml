@@ -28,7 +28,7 @@ spec:
     image:
       # Use the image provided by K3s
       repository: "docker.io/rancher/mirrored-coredns-coredns"
-      tag: "1.14.6"
+      tag: "1.14.7"
     servers:
     - zones:
       - zone: .

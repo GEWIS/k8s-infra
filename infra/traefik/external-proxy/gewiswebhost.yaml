@@ -86,8 +86,28 @@ spec:
   tls:
     passthrough: true
 ---
-# webhost-mgmt.gewis.nl — webhost admin interface (Webmin on port 10002).
-# Plain HTTP backend, so this stays Traefik-terminated (no SNI mismatch).
+# webhost-mgmt.gewis.nl — Virtualmin/Webmin admin interface (Webmin/MiniServ on
+# the webhost's :10002, plain HTTP backend, so this stays Traefik-terminated).
+#
+# Login flow: the SSO site at webhost-auth.gewis.nl (routed via the TLS
+# passthrough above) mints a Webmin session and redirects the browser to
+# /session_login.cgi?session=… on this host. Webmin then answers 302 with a
+# `Location` built from the Host header plus its own listen port —
+# http://webhost-mgmt.gewis.nl:10002/ — which is unreachable from browsers.
+# The old front proxy fixed this on /session_login.cgi with
+# `proxy_hide_header location; add_header location /`; the middleware below
+# replicates it by forcing `Location: /` so the browser lands back on
+# https://webhost-mgmt.gewis.nl/ with its fresh sid cookie.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: webhost-mgmt-session-location
+  namespace: external-proxy
+spec:
+  headers:
+    customResponseHeaders:
+      Location: "/"
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -97,13 +117,26 @@ spec:
   entryPoints:
     - websecure
   routes:
+    # Session bootstrap — needs the Location override (see above). Applies to
+    # all /session_login.cgi responses; non-redirects merely gain a harmless
+    # Location header, exactly as nginx's add_header did.
+    - kind: Rule
+      match: Host(`webhost-mgmt.gewis.nl`) && Path(`/session_login.cgi`)
+      middlewares:
+        - name: webhost-mgmt-session-location
+      services:
+        - name: gewiswebhost
+          port: 10002
+          scheme: http
+          # Forward the public host: Webmin renders it into its pages and
+          # redirects. The portful absolute redirects it builds are handled by
+          # the Location override above.
+          passHostHeader: true
+    # Everything else (the Webmin UI).
     - kind: Rule
       match: Host(`webhost-mgmt.gewis.nl`)
       services:
         - name: gewiswebhost
           port: 10002
           scheme: http
-          # Webmin builds its post-login redirect from the Host header. Forward
-          # the public host so it redirects to webhost-mgmt.gewis.nl, not the
-          # internal webhost.localnet.gewis.nl:10002 (unreachable from browsers).
           passHostHeader: true

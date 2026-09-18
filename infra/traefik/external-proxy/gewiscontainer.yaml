@@ -248,16 +248,6 @@ spec:
                   number: 9401
             path: /
             pathType: Prefix
-    - host: sudosos.gewis.nl
-      http:
-        paths:
-          - backend:
-              service:
-                name: gewiscontainer
-                port:
-                  number: 9300
-            path: /
-            pathType: Prefix
     - host: pkg.gewis.nl
       http:
         paths:

@@ -56,14 +56,14 @@ spec:
         delete_request_store: filesystem
 
       limits_config:
-        retention_period: 24h
+        retention_period: 2160h
 
     singleBinary:
       replicas: 1
       persistence:
         enabled: true
-        size: 20Gi
-        storageClass: longhorn
+        size: 40Gi
+        storageClass: longhorn-logs
 
     gateway:
       enabled: true

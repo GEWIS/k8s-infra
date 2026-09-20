@@ -67,12 +67,70 @@ spec:
 
           loki.source.kubernetes "pod_logs" {
             targets    = discovery.relabel.labels.output
-            forward_to = [loki.write.cbc_loki.receiver]
+            forward_to = [
+              loki.write.cbc_loki.receiver,
+              loki.relabel.sudosos_namespaces.receiver,
+              loki.relabel.traefik_pods.receiver,
+            ]
+          }
+
+          loki.relabel "sudosos_namespaces" {
+            forward_to = [loki.write.abc_pos_loki.receiver]
+
+            rule {
+              action        = "keep"
+              source_labels = ["namespace"]
+              regex         = "sudosos-.*"
+            }
+          }
+
+          loki.relabel "traefik_pods" {
+            forward_to = [loki.process.traefik_access_logs.receiver]
+
+            rule {
+              action        = "keep"
+              source_labels = ["namespace"]
+              regex         = "traefik"
+            }
+          }
+
+          loki.process "traefik_access_logs" {
+            forward_to = [loki.relabel.sudosos_routers.receiver]
+
+            stage.json {
+              expressions = { RouterName = "" }
+            }
+
+            stage.labels {
+              values = { router = "RouterName" }
+            }
+          }
+
+          loki.relabel "sudosos_routers" {
+            forward_to = [loki.write.abc_pos_loki.receiver]
+
+            rule {
+              action        = "keep"
+              source_labels = ["router"]
+              regex         = "sudosos-.*"
+            }
+
+            rule {
+              action = "labeldrop"
+              regex  = "router"
+            }
           }
 
           loki.write "cbc_loki" {
             endpoint {
               url       = "http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push"
               tenant_id = "CBC"
+            }
+          }
+
+          loki.write "abc_pos_loki" {
+            endpoint {
+              url       = "http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push"
+              tenant_id = "ABC-POS"
             }
           }

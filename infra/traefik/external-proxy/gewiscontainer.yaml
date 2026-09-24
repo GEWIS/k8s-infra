@@ -19,10 +19,6 @@ spec:
       port: 9676
       protocol: TCP
       targetPort: 9676
-    - name: parelpracht
-      port: 9639
-      protocol: TCP
-      targetPort: 9639
     - name: sharelatex
       port: 9195
       protocol: TCP
@@ -130,16 +126,6 @@ spec:
                 name: gewiscontainer
                 port:
                   number: 9676
-            path: /
-            pathType: Prefix
-    - host: parelpracht.gewis.nl
-      http:
-        paths:
-          - backend:
-              service:
-                name: gewiscontainer
-                port:
-                  number: 9639
             path: /
             pathType: Prefix
     - host: latex.gewis.nl
@@ -267,4 +253,4 @@ spec:
                 port:
                   number: 9200
             path: /
-            pathType: Prefix 
+            pathType: Prefix

@@ -77,7 +77,6 @@ spec:
         HostSNI(`intro25.gewis.nl`) ||
         HostSNI(`linkinbio.gewis.nl`) ||
         HostSNI(`odc.gewis.nl`) ||
-        HostSNI(`static.gewis.nl`) ||
         HostSNI(`ssg.gewis.nl`) ||
         HostSNI(`stijl.gewis.nl`)
       services:

@@ -39,6 +39,18 @@ spec:
     customResponseHeaders:
       Upgrade: ""
 ---
+# gewis.nl/corporateidentity/public/logo/* — redirect to static.gewis.nl/logo/*
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-corporateidentity-logo
+  namespace: external-proxy
+spec:
+  redirectRegex:
+    regex: "^https://gewis\\.nl/corporateidentity/public/logo/(.*)"
+    replacement: "https://static.gewis.nl/logo/${1}"
+    permanent: true
+---
 # gewis.nl — main site
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -48,15 +60,13 @@ metadata:
 spec:
   routes:
     - kind: Rule
-      match: Host(`gewis.nl`) && PathPrefix(`/corporateidentity`)
+      match: Host(`gewis.nl`) && PathPrefix(`/corporateidentity/public/logo`)
       middlewares:
-        - name: gewisweb-cors
-        - name: corporateidentity-headers
+        - name: redirect-corporateidentity-logo
       services:
-        - name: gewiswebhost
-          port: 443
-          scheme: https
-          serversTransport: stijl-gewis-nl-transport
+        - name: gewiscontainer
+          port: 9210
+          scheme: http
     - kind: Rule
       match: Host(`gewis.nl`)
       middlewares:

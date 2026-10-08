@@ -72,7 +72,6 @@ spec:
         HostSNI(`gehack.gewis.nl`) ||
         HostSNI(`gezwem.gewis.nl`) ||
         HostSNI(`inf.gewis.nl`) ||
-        HostSNI(`info.gewis.nl`) ||
         HostSNI(`intro.gewis.nl`) ||
         HostSNI(`intro25.gewis.nl`) ||
         HostSNI(`linkinbio.gewis.nl`) ||

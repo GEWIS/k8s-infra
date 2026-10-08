@@ -1,0 +1,8 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: xff-to-xrealip
+  namespace: traefik
+spec:
+  plugin:
+    traefik-xff-to-xrealip: {}

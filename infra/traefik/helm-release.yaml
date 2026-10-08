@@ -41,10 +41,13 @@ spec:
               permanent: true
       websecure:
         asDefault: true
+        http:
+          middlewares:
+            - traefik-xff-to-xrealip@kubernetescrd
         forwardedHeaders:
           trustedIPs:
-            - "131.155.10.134"
-            - "131.155.10.135"
+            - "131.155.10.134" # WAF
+            - "131.155.10.135" # WAF
             - "145.116.44.49" #Geproxy
             - "145.116.47.68" #Geproxy in Atlas
         transport:
@@ -97,6 +100,9 @@ spec:
         traefik-oidc-auth:
           moduleName: "github.com/sevensolutions/traefik-oidc-auth"
           version: "v0.18.0"
+        traefik-xff-to-xrealip:
+          moduleName: "github.com/jeppestaerk/traefik-xff-to-xrealip"
+          version: "v0.1.3"
     tlsStore:
       default:
         defaultCertificate:

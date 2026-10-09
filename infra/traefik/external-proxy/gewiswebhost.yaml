@@ -49,19 +49,8 @@ spec:
         HostSNI(`personal.gewis.nl`) ||
         HostSNI(`mta-sts.gewis.nl`) ||
         HostSNI(`webhost-auth.gewis.nl`) ||
-        HostSNI(`vz.personal.gewis.nl`) ||
-        HostSNI(`signature.gewis.nl`) ||
-        HostSNI(`secr.personal.gewis.nl`) ||
         HostSNI(`rink.personal.gewis.nl`) ||
-        HostSNI(`pm.personal.gewis.nl`) ||
-        HostSNI(`fse.gewis.nl`) ||
-        HostSNI(`co.personal.gewis.nl`) ||
-        HostSNI(`cib.personal.gewis.nl`) ||
         HostSNI(`cbc.gewis.nl`) ||
-        HostSNI(`board.gewis.nl`) ||
-        HostSNI(`infoscherm.gewis.nl`) ||
-        HostSNI(`ceb.personal.gewis.nl`) ||
-        HostSNI(`femke.personal.gewis.nl`) ||
         HostSNI(`9eglinster.gewis.nl`) ||
         HostSNI(`geglinster.gewis.nl`) ||
         HostSNI(`boom.gewis.nl`) ||
@@ -69,15 +58,11 @@ spec:
         HostSNI(`avico.gewis.nl`) ||
         HostSNI(`bac.gewis.nl`) ||
         HostSNI(`defi.gewis.nl`) ||
-        HostSNI(`gehack.gewis.nl`) ||
         HostSNI(`gezwem.gewis.nl`) ||
-        HostSNI(`inf.gewis.nl`) ||
         HostSNI(`intro.gewis.nl`) ||
-        HostSNI(`intro25.gewis.nl`) ||
         HostSNI(`linkinbio.gewis.nl`) ||
         HostSNI(`odc.gewis.nl`) ||
-        HostSNI(`ssg.gewis.nl`) ||
-        HostSNI(`stijl.gewis.nl`)
+        HostSNI(`ssg.gewis.nl`)
       services:
         - name: gewiswebhost
           port: 443
